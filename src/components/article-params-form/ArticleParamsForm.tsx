@@ -5,7 +5,7 @@ import { RadioGroup } from 'src/ui/radio-group';
 import { Separator } from 'src/ui/separator';
 import { Text } from 'src/ui/text';
 import { useRef, useState } from 'react';
-import clsx from 'clsx';
+import { useClose } from 'src/hooks/useClose';
 import {
 	fontFamilyOptions,
 	fontColors,
@@ -33,14 +33,15 @@ export const ArticleParamsForm = ({ onApply }: ArticleParamsFormProps) => {
 		setIsOpen(!isOpen);
 	};
 
-	const handleOutsideClick = (event: React.MouseEvent) => {
-		if (
-			sidebarRef.current &&
-			!sidebarRef.current.contains(event.target as Node)
-		) {
-			setIsOpen(false);
-		}
+	const closeSidebar = () => {
+		setIsOpen(false);
 	};
+
+	useClose({
+		isOpen,
+		onClose: closeSidebar,
+		rootRef: sidebarRef,
+	});
 
 	const handleReset = () => {
 		setFormState(defaultArticleState);
@@ -55,19 +56,16 @@ export const ArticleParamsForm = ({ onApply }: ArticleParamsFormProps) => {
 	return (
 		<>
 			<ArrowButton isOpen={isOpen} onClick={toggleSidebar} />
-			{isOpen && (
-				<div className={styles.overlay} onClick={handleOutsideClick} />
-			)}
 			<aside
 				ref={sidebarRef}
-				className={clsx(styles.container, {
-					[styles.container_open]: isOpen,
-				})}>
+				className={`${styles.container} ${
+					isOpen ? styles.container_open : ''
+				}`}>
 				<form
 					className={styles.form}
 					onSubmit={handleSubmit}
 					onReset={handleReset}>
-					<Text as='h2' size={31} weight={800} uppercase dynamicLite>
+					<Text as='h2' size={31} weight={800} uppercase>
 						Задайте параметры
 					</Text>
 
